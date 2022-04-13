@@ -2,6 +2,6 @@
   "printWidth": 100,
   "semi": true,
   "trailingComma": "none",
-  "arrowParens": "avoid",
+  "arrowParens": "always",
   "bracketSameLine": false
 }

@@ -10,7 +10,7 @@ exports.api = axios.create({
   baseURL: "https://api.twitch.tv",
   timeout: 1000,
   headers: {
-    'Client-Id': process.env.APP_CLIENTID
+    "Client-Id": process.env.APP_CLIENTID
   }
 });
 
@@ -22,7 +22,7 @@ exports.authenticate = twauth.authenticate;
 
 /* Get global badges */
 exports.getGlobalBadges = async () => {
-  const resp = await exports.authedapi.get("/helix/chat/badges/global", { });
+  const resp = await exports.authedapi.get("/helix/chat/badges/global", {});
   const data = resp.data;
   debug.log("Loaded %d global badges", data.data.length);
   return data.data;

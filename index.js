@@ -37,9 +37,12 @@ app.get("/badge/:set/:version/url/:size", twasset.getBadgeUrl);
 app.get("/emote", twasset.getEmote);
 app.get("/cheermote", twasset.getCheermote);
 
-twasset.authenticate().then(() => {
-  const port = process.env.APP_DEVSERVER_PORT || 8081;
-  app.listen(port);
-}).catch((error) => {
-  console.error("Failed to authenticate with Twitch: %o", error);
-});
+twasset
+  .authenticate()
+  .then(() => {
+    const port = process.env.APP_DEVSERVER_PORT || 8081;
+    app.listen(port);
+  })
+  .catch((error) => {
+    console.error("Failed to authenticate with Twitch: %o", error);
+  });

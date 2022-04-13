@@ -54,22 +54,26 @@ exports.parseStackFrame = (frame) => {
 /* Get the parsed stack frame for debug.log caller */
 function getDebugLogCaller(offset) {
   const error = (() => {
-    try { throw new Error("stack"); } catch (err) { return err; }
+    try {
+      throw new Error("stack");
+    } catch (err) {
+      return err;
+    }
   })();
   const frame_lines = error.stack.split(/\n/).slice(1);
   const frames = frame_lines.map((f) => exports.parseStackFrame(f));
   for (let i = 0; i < frames.length; ++i) {
     if (isDebugLogFrame(frames[i])) {
-      if (i+offset < frames.length) {
-        return frames[i+offset];
+      if (i + offset < frames.length) {
+        return frames[i + offset];
       } else {
-        console.error("%d past the end of array", i+offset);
+        console.error("%d past the end of array", i + offset);
       }
     }
   }
-};
+}
 
-exports.log = (message, ...args ) => {
+exports.log = (message, ...args) => {
   if (process.env.APP_DEBUG === "on") {
     const caller = getDebugLogCaller(1);
     const prefix = `DEBUG ${caller.file}:${caller.line}:`;

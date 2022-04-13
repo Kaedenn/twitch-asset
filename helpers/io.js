@@ -1,7 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 
-async function readJSON(path, encoding="utf8") {
+async function readJSON(path, encoding = "utf8") {
   const fh = await fs.open(path);
   const data = await fh.readFile({ encoding });
   await fh.close();
@@ -9,8 +9,7 @@ async function readJSON(path, encoding="utf8") {
   const str = data.trim();
   try {
     return JSON.parse(str);
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Failed to parse JSON %o", str);
     throw error;
   }
@@ -28,5 +27,4 @@ exports.readJSON = (path) => {
 
 exports.writeJSON = (path, data) => {
   return writeJSON(path);
-}
-
+};

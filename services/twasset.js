@@ -40,13 +40,16 @@ exports.authenticate = twhttp.authenticate;
 
 /* Get a badge for a specific user ID */
 exports.getBadgesFor = (req, res) => {
-  twhttp.authedapi.get("/helix/chat/badges", {
-    broadcaster_id: req.params.broadcaster
-  }).then((data) => {
-    res.status(200).send(data.data);
-  }).catch((err) => {
-    res.status(500).send(err);
-  });
+  twhttp.authedapi
+    .get("/helix/chat/badges", {
+      broadcaster_id: req.params.broadcaster
+    })
+    .then((data) => {
+      res.status(200).send(data.data);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
 };
 
 /* Get global badges (TODO: parameter for ignoring cache) */
@@ -54,15 +57,18 @@ exports.getBadges = (req, res) => {
   if (Object.entries(badge_cache).length > 0) {
     res.status(200).send({ data: Object.values(badge_cache) });
   } else {
-    twhttp.getGlobalBadges().then((data) => {
-      for (const badge of data) {
-        badge_cache[badge.set_id] = badge;
-      }
-      res.status(200).send(data);
-    }).catch((err) => {
-      console.error(err);
-      res.status(500).send(err);
-    });
+    twhttp
+      .getGlobalBadges()
+      .then((data) => {
+        for (const badge of data) {
+          badge_cache[badge.set_id] = badge;
+        }
+        res.status(200).send(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err);
+      });
   }
 };
 
