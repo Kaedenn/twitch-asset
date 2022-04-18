@@ -9,8 +9,8 @@ const api = axios.create({
   timeout: 1000
 });
 
-describe("endpoint is available", function() {
-  it("should respond to simple requests", async function() {
+describe("endpoint is available", function () {
+  it("should respond to simple requests", async function () {
     const response = await api.get("/status");
     assert(response.status === 200);
     const data = response.data;

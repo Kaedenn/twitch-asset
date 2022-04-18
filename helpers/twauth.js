@@ -96,6 +96,7 @@ async function loadTokenFromFile() {
 exports.authenticate = () => {
   return loadTokenFromFile()
     .then(() => {
+      console.log("Loaded authentication token from file");
       exports.api.defaults.headers.common["Authorization"] = getHeader();
       debug("Authenticated");
     })
@@ -104,39 +105,3 @@ exports.authenticate = () => {
       return getNewToken(true);
     });
 };
-
-/* Intercept requests to ensure the Authorization header is present.
- * This handles the case where the local file does not exist or cannot be read.
-exports.api.interceptors.request.use(
-  function (config) {
-    if (!config.headers["Authorization"]) {
-      if (access.access_token) {
-        config.headers["Authorization"] = getHeader();
-        return config;
-      }
-      return axios.post("https://id.twitch.tv/oauth2/token", {
-        client_id: process.env.APP_CLIENTID,
-        client_secret: process.env.APP_SECRET,
-        grant_type: 'client_credentials'
-      }).then((resp) => {
-          const data = resp.data;
-          if (data.token) {
-            access.access_token = data.token;
-            access.date = Date.now();
-            access.expires_in = data.expires_in;
-            access.access_token_type = data.token_type;
-            config.headers["Authorization"] = getHeader();
-            return io.writeJSON(AUTH_FILE, JSON.stringify(access));
-          }
-        })
-        .then(() => config)
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  },
-  function (error) {
-    return error;
-  }
-);
- */
