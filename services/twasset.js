@@ -1,6 +1,6 @@
 const responses = require("../helpers/responses");
 const twhttp = require("../helpers/twhttp");
-const debug = require("../helpers/debug");
+const debug = require("debug")("services/twasset");
 
 const badge_cache = {};
 const emote_cache = {};
@@ -52,7 +52,7 @@ exports.getBadgesFor = (req, res) => {
     });
 };
 
-/* Get global badges (TODO: parameter for ignoring cache) */
+/* Get global badges */
 exports.getBadges = (req, res) => {
   if (Object.entries(badge_cache).length > 0) {
     res.status(200).send({ data: Object.values(badge_cache) });
@@ -75,7 +75,7 @@ exports.getBadges = (req, res) => {
 /* Get a specific badge */
 exports.getBadge = (req, res) => {
   const set = req.params.set;
-  const version = req.params.version;
+  const version = req.params.version || null;
   getBadge(set, version).then((badge) => {
     if (badge !== null) {
       res.status(200).send(badge);
@@ -94,6 +94,9 @@ exports.getBadgeUrl = (req, res) => {
   let size = req.params.size || "image_url_1x";
   if (SIZE_MAP[size]) {
     size = SIZE_MAP[size];
+  }
+  if (!set || !version) {
+    return res.status(400).send();
   }
   getBadge(set, version).then((badge) => {
     if (badge !== null) {
@@ -115,7 +118,7 @@ exports.getBadgeUrl = (req, res) => {
 };
 
 exports.getBadgeDebug = (req, res) => {
-  debug.log("%o", badge_cache);
+  debug("%o", badge_cache);
   res.status(200).send({});
 };
 

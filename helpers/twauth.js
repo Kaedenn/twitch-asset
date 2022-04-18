@@ -1,11 +1,9 @@
-/* TODO: Handle expired tokens */
-
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+const debug = require("debug")("twauth");
 
 const io = require("../helpers/io");
-const debug = require("../helpers/debug");
 const strutil = require("../helpers/string");
 
 /* Access token storage object */
@@ -17,7 +15,7 @@ const access = {
 };
 
 /* Local access token */
-const prefix = process.env.npm_config_local_prefix;
+const prefix = io.dataPath();
 exports.AUTH_FILE = "token.json";
 exports.AUTH_FILE_PATH = path.join(prefix, exports.AUTH_FILE);
 
@@ -99,7 +97,7 @@ exports.authenticate = () => {
   return loadTokenFromFile()
     .then(() => {
       exports.api.defaults.headers.common["Authorization"] = getHeader();
-      debug.log("Authenticated");
+      debug("Authenticated");
     })
     .catch((error) => {
       console.log("Failed to load token from file; trying to get a new one...");

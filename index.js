@@ -3,9 +3,15 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 
+if (!process.env.npm_package_name) {
+  throw new Error("Please run this through npm");
+}
+
 const status = require("./services/status");
 const twasset = require("./services/twasset");
-const debug = require("./helpers/debug");
+const debugHelper = require("./helpers/debug");
+
+const debug = debugHelper.create("index");
 
 const app = express();
 const corsOptions = {
@@ -13,9 +19,7 @@ const corsOptions = {
   methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "UPDATE"]
 };
 
-console.log("Application %o started", debug.info());
-
-debug.log("Debugging is enabled");
+debug("Debugging is enabled: %o", debugHelper.info());
 
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
@@ -31,6 +35,7 @@ app.get("/badge_debug", twasset.getBadgeDebug);
 
 app.get("/badges", twasset.getBadges);
 app.get("/badges/:broadcaster", twasset.getBadgesFor);
+app.get("/badge/:set", twasset.getBadge);
 app.get("/badge/:set/:version", twasset.getBadge);
 app.get("/badge/:set/:version/url", twasset.getBadgeUrl);
 app.get("/badge/:set/:version/url/:size", twasset.getBadgeUrl);

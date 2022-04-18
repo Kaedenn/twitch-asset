@@ -1,18 +1,31 @@
-/* FIXME: Use debug module */
-
 const path = require("path");
+const createDebug = require("debug");
+exports.createDebug = createDebug;
 
-const fpat_func = "(?<func>.*)";
-const fpat_path = "(?<path>(?<dir>.*)\\/(?<file>.*))";
-const fpat_line = "(?<line>[1-9][0-9]*)";
-const fpat_column = "(?<column>[1-9][0-9]*)";
+function create(name = "") {
+  const obj = createDebug(name);
+  obj.enabled = enabled();
+  return obj;
+}
+exports.create = create;
 
-const FRAME_PATTERNS = [
-  /* With a function name */
-  `^[\t ]*at ${fpat_func} \\(${fpat_path}:${fpat_line}:${fpat_column}\\)`,
-  /* Without a function name */
-  `^[\t ]*at ${fpat_path}:${fpat_line}:${fpat_column}`
-];
+function enabled() {
+  return process.env.APP_DEBUG === "on";
+}
+exports.enabled = enabled;
+
+const FRAME_PATTERNS = (() => {
+  const fpat_func = "(?<func>.*)";
+  const fpat_path = "(?<path>(?<dir>.*)\\/(?<file>.*))";
+  const fpat_line = "(?<line>[1-9][0-9]*)";
+  const fpat_column = "(?<column>[1-9][0-9]*)";
+  return [
+    /* With a function name */
+    `^[\t ]*at ${fpat_func} \\(${fpat_path}:${fpat_line}:${fpat_column}\\)`,
+    /* Without a function name */
+    `^[\t ]*at ${fpat_path}:${fpat_line}:${fpat_column}`
+  ];
+})();
 
 /* True if the given frame belongs to debug.log */
 function isDebugLogFrame(fdata) {
@@ -24,19 +37,8 @@ function isDebugLogFrame(fdata) {
   return true;
 }
 
-exports.enabled = () => {
-  return process.env.APP_DEBUG === "on";
-};
-
-/* Parse a stack frame (string) into an object with the following fields:
- *  func    function name or "<anonymous>"
- *  path    absolute file path
- *  dir     directory component of file path
- *  file    filename component of file path
- *  line    line number
- *  column  column number
- */
-exports.parseStackFrame = (frame) => {
+function parseStackFrame(frame) {
+  /* fields: func, path, dir, file, line, column */
   for (const pat of FRAME_PATTERNS) {
     const match = frame.match(pat);
     if (match) {
@@ -49,7 +51,39 @@ exports.parseStackFrame = (frame) => {
     }
   }
   return null;
-};
+}
+exports.parseStackFrame = parseStackFrame;
+
+function getCaller(offset = 1) {
+  const error = (() => {
+    try {
+      throw new Error("stack");
+    } catch (err) {
+      return err;
+    }
+  })();
+  if (!error.stack) {
+    return {};
+  }
+  const lines = error.stack.split(/\n/).slice(1);
+  const frames = lines.map((line) => parseStackFrame(line));
+  for (let i = 0; i < frames.length; ++i) {
+    if (isDebugLogFrame(frames[i])) {
+      if (i + offset < frames.length) {
+        return frames[i + offset];
+      } else {
+        console.error(
+          "Invalid frame %d (%d+offset %d); max=%d",
+          i + offset,
+          i,
+          offset,
+          frames.length
+        );
+      }
+    }
+  }
+}
+exports.getCaller = getCaller;
 
 /* Get the parsed stack frame for debug.log caller */
 function getDebugLogCaller(offset) {

@@ -1,6 +1,17 @@
 const fs = require("fs/promises");
 const path = require("path");
 
+function dataPath() {
+  let path = process.env.APP_DATA_PATH;
+  if (!path) path = process.env.npm_config_local_prefix;
+  if (!path) path = process.cwd();
+  if (!path) {
+    throw new Error("Failed to determine data path");
+  }
+  return path;
+}
+exports.dataPath = dataPath;
+
 async function readJSON(path, encoding = "utf8") {
   const fh = await fs.open(path);
   const data = await fh.readFile({ encoding });

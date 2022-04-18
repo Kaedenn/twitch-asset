@@ -3,7 +3,7 @@
 const axios = require("axios");
 
 const twauth = require("../helpers/twauth");
-const debug = require("../helpers/debug");
+const debug = require("debug")("twhttp");
 
 /* Regular (unauthenticated) API */
 exports.api = axios.create({
@@ -24,6 +24,6 @@ exports.authenticate = twauth.authenticate;
 exports.getGlobalBadges = async () => {
   const resp = await exports.authedapi.get("/helix/chat/badges/global", {});
   const data = resp.data;
-  debug.log("Loaded %d global badges", data.data.length);
+  debug("Loaded %d global badges", data.data.length);
   return data.data;
 };
