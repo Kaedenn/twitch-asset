@@ -3,7 +3,7 @@
 const axios = require("axios");
 
 const twauth = require("../helpers/twauth");
-const debug = require("debug")("twhttp");
+const debug = require("../helpers/debug").create("twhttp");
 
 /* Regular (unauthenticated) API */
 exports.api = axios.create({

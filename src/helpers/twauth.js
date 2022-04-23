@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
-const debug = require("debug")("twauth");
+const debug = require("../helpers/debug").create("twauth");
 
 const io = require("../helpers/io");
 const strutil = require("../helpers/string");
@@ -84,7 +84,7 @@ async function loadTokenFromFile() {
       if (error.code != "ENOENT") {
         console.error("Failed reading %s: %o", exports.AUTH_FILE_PATH, error);
       } else {
-        console.log("Auth file %s does not exist", exports.AUTH_FILE_PATH);
+        debug("Auth file %s does not exist", exports.AUTH_FILE_PATH);
       }
       throw error;
     });
@@ -96,7 +96,7 @@ async function loadTokenFromFile() {
 exports.authenticate = () => {
   return loadTokenFromFile()
     .then(() => {
-      console.log("Loaded authentication token from file");
+      debug("Loaded authentication token from file");
       exports.api.defaults.headers.common["Authorization"] = getHeader();
       debug("Authenticated");
     })

@@ -7,11 +7,11 @@ if (!process.env.npm_package_name) {
   throw new Error("Please run this through npm");
 }
 
+const debugHelper = require("./helpers/debug");
+const debug = debugHelper.create("index");
+
 const status = require("./services/status");
 const twasset = require("./services/twasset");
-const debugHelper = require("./helpers/debug");
-
-const debug = debugHelper.create("index");
 
 const app = express();
 const corsOptions = {

@@ -118,5 +118,5 @@ exports.log = (message, ...args) => {
 exports.info = () => ({
   name: process.env.npm_package_name,
   version: process.env.npm_package_version,
-  debug: exports.enabled()
+  debug: enabled()
 });

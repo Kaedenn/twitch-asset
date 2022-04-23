@@ -6,6 +6,7 @@
 # Protected files
 .env
 token.json
+cache/
 
 # compiled output
 /dist

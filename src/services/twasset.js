@@ -1,10 +1,18 @@
+const debug = require("../helpers/debug").create("twasset");
+
 const responses = require("../helpers/responses");
 const twhttp = require("../helpers/twhttp");
-const debug = require("debug")("services/twasset");
+const cache = require("../helpers/cache");
 
 const badge_cache = {};
 const emote_cache = {};
 const cheermote_cache = {};
+
+const cache_badges = new cache.Cache("badges", async function (name, rules) {
+  debug(`Loading cache for ${name}`);
+  return {};
+});
+cache_badges.init();
 
 const SIZE_MAP = {
   "1x": "image_url_1x",
