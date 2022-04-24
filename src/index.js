@@ -35,7 +35,7 @@ app.get("/badge_debug", twasset.getBadgeDebug);
 
 app.get("/badges", twasset.getBadges);
 app.get("/badges/:broadcaster", twasset.getBadgesFor);
-app.get("/badge/:set", twasset.getBadge);
+app.get("/badge/:set", twasset.getBadgeSet);
 app.get("/badge/:set/:version", twasset.getBadge);
 app.get("/badge/:set/:version/url", twasset.getBadgeUrl);
 app.get("/badge/:set/:version/url/:size", twasset.getBadgeUrl);
@@ -44,6 +44,7 @@ app.get("/cheermote", twasset.getCheermote);
 
 twasset
   .authenticate()
+  .then(() => twasset.initialize())
   .then(() => {
     const port = process.env.APP_DEVSERVER_PORT || 8081;
     app.listen(port);

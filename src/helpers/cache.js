@@ -35,6 +35,17 @@ class Cache {
   get name() { return this._name; }
   get path() { return path.join(CACHE_PATH, `${this.name}.json`); }
 
+  add(key, value) {
+    if (this._data.hasOwnProperty(key)) {
+      throw new Error(`Cannot add "${key}" with value "${value}"; entry exists`);
+    }
+    this._data[key] = value;
+  }
+
+  set(key, value) {
+    this._data[key] = value;
+  }
+
   has(key) {
     return this._data.hasOwnProperty(key);
   }
@@ -44,6 +55,25 @@ class Cache {
       return this._data[key];
     }
     throw new Error(`Key "${key}" not present in cache`);
+  }
+
+  get_maybe(key) {
+    if (this.has(key)) {
+      return key;
+    }
+    return null;
+  }
+
+  entries() {
+    return Object.entries(this._data);
+  }
+
+  keys() {
+    return Object.keys(this._data);
+  }
+
+  values() {
+    return Object.values(this._data);
   }
 
   async getAsync(key) {
