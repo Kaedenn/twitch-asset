@@ -7,11 +7,11 @@ if (!process.env.npm_package_name) {
   throw new Error("Please run this through npm");
 }
 
-const debugHelper = require("./helpers/debug");
+const debugHelper = require("#helpers/debug");
 const debug = debugHelper.create("index");
 
-const status = require("./services/status");
-const twasset = require("./services/twasset");
+const status = require("#services/status");
+const twasset = require("#services/twasset");
 
 const app = express();
 const corsOptions = {
@@ -42,7 +42,9 @@ app.get("/badge/:set/:version/url/:size", twasset.getBadgeUrl);
 app.get("/emote", twasset.getEmote);
 app.get("/cheermote", twasset.getCheermote);
 
-Promise.all([twasset.authenticate(), twasset.initialize()])
+twasset
+  .authenticate()
+  .then(() => twasset.initialize())
   .then(() => {
     const port = process.env.APP_DEVSERVER_PORT || 8081;
     app.listen(port);

@@ -1,10 +1,10 @@
+const debug = require("../debug").create("twauth");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
-const debug = require("../helpers/debug").create("twauth");
 
-const io = require("../helpers/io");
-const strutil = require("../helpers/string");
+const io = require("#helpers/io");
+const strutil = require("#helpers/string");
 
 /* Access token storage object */
 const access = {

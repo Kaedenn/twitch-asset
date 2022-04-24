@@ -1,5 +1,5 @@
-const responses = require("../helpers/responses");
-const debug = require("../helpers/debug").create("services/status");
+const responses = require("#helpers/responses");
+const debug = require("#helpers/debug").create("services/status");
 
 exports.getHome = responses.build(200, true, { status: "online" });
 

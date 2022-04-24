@@ -1,7 +1,7 @@
-const debug = require("../debug").create("twasset");
+const debug = require("#helpers/debug").create("twasset");
 
-const twhttp = require("../twhttp");
-const cache = require("../cache");
+const twhttp = require("#helpers/twitch/http");
+const cache = require("#helpers/cache");
 
 const SIZE_MAP = {
   "1x": "image_url_1x",

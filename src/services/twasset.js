@@ -1,10 +1,10 @@
-const debug = require("../helpers/debug").create("twasset");
+const debug = require("#helpers/debug").create("twasset");
 
-const responses = require("../helpers/responses");
-const twhttp = require("../helpers/twhttp");
-const cache = require("../helpers/cache");
+const responses = require("#helpers/responses");
+const cache = require("#helpers/cache");
 
-const twbadge = require("../helpers/twitch/badge");
+const twhttp = require("#helpers/twitch/http");
+const twbadge = require("#helpers/twitch/badge");
 
 exports.authenticate = twhttp.authenticate;
 
