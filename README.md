@@ -113,3 +113,23 @@ Not yet implemented.
 
 Not yet implemented.
 
+# Local deployment
+
+I highly recommend you use this endpoint locally. You will need to add a Twitch extension and configure this endpoint with the values you receive. Follow these steps to do that:
+
+  1) Register a new Twitch application.
+  1.1) Go to [https://dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps).
+  1.2) Click "Register Your Application".
+  1.3) Give your application a name.
+  1.4) Configure the endpoint to be `http://localhost:8081`. Feel free to change the port number if desired. You should not use a port number less than 1024.
+  1.5) Select any category that makes sense. I selected "Website Integration".
+  1.6) Make note of your Client ID.
+  1.7) Generate a new client secret and make note of the value. This value will appear once and you cannot view it again without generating a new one. Therefore, copy it somewhere safe and secure (such as a password manager).
+  2) Configure this application to use your Client ID and client secret.
+  2.1) Copy or rename `.env.sample` to `.env`.
+  2.2) Edit `.env` and replace `APP_CLIENTID` and `APP_SECRET` with the values you obtained above. Feel free to change the port number if desired.
+  2.3) Run `npm install` if you haven't already.
+  2.4) Run `npm run start`.
+
+You can now run `npm test` to ensure the endpoint works properly.
+
