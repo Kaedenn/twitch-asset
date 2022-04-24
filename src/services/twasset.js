@@ -15,7 +15,8 @@ exports.initialize = initialize;
 
 /* Get a badge for a specific user ID */
 exports.getBadgesFor = (req, res) => {
-  twbadge.getUserBadges(req.params.broadcaster)
+  twbadge
+    .getUserBadges(req.params.broadcaster)
     .then((data) => {
       res.status(200).send(data.data);
     })

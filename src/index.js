@@ -42,9 +42,7 @@ app.get("/badge/:set/:version/url/:size", twasset.getBadgeUrl);
 app.get("/emote", twasset.getEmote);
 app.get("/cheermote", twasset.getCheermote);
 
-twasset
-  .authenticate()
-  .then(() => twasset.initialize())
+Promise.all([twasset.authenticate(), twasset.initialize()])
   .then(() => {
     const port = process.env.APP_DEVSERVER_PORT || 8081;
     app.listen(port);

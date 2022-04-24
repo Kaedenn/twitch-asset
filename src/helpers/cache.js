@@ -9,8 +9,7 @@ exports.CACHE_PATH = CACHE_PATH;
 
 /* Ensure the cache path exists */
 async function createPath(name) {
-  await fs.stat(CACHE_PATH)
-    .catch((err) => fs.mkdir(CACHE_PATH));
+  await fs.stat(CACHE_PATH).catch((err) => fs.mkdir(CACHE_PATH));
 }
 
 /**
@@ -32,8 +31,12 @@ class Cache {
     createPath();
   }
 
-  get name() { return this._name; }
-  get path() { return path.join(CACHE_PATH, `${this.name}.json`); }
+  get name() {
+    return this._name;
+  }
+  get path() {
+    return path.join(CACHE_PATH, `${this.name}.json`);
+  }
 
   add(key, value) {
     if (this._data.hasOwnProperty(key)) {
@@ -87,27 +90,26 @@ class Cache {
     const loaded = await this.load();
     if (!loaded) {
       debug(`Failed to load cache ${this.name}; refreshing...`);
-      this._data = await (this._updateFunc)(this._name, this._updateRules);
+      this._data = await this._updateFunc(this._name, this._updateRules);
       await this.save();
     }
   }
 
   async refresh() {
     /* TODO: Determine if the refresh is allowed to occur by the rules */
-    const data = await (this._updateFunc)(this._name, this._updateRules);
+    const data = await this._updateFunc(this._name, this._updateRules);
     Object.assign(this._data, data);
   }
 
   async load() {
     try {
       const fh = await fs.open(this.path);
-      const data = await fh.readFile({ encoding: 'utf8' });
+      const data = await fh.readFile({ encoding: "utf8" });
       await fh.close();
       this._data = JSON.parse(data.trim());
       return true;
-    }
-    catch (err) {
-      if (err.code != 'ENOENT') {
+    } catch (err) {
+      if (err.code != "ENOENT") {
         throw err;
       }
       debug(`Cache ${this.name} at ${this.path} does not exist`);
@@ -123,4 +125,3 @@ class Cache {
   }
 }
 exports.Cache = Cache;
-

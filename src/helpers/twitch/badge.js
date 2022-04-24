@@ -18,14 +18,12 @@ cached_badges.init();
 exports.cached_badges = cached_badges;
 
 async function refreshCache() {
-  return await twhttp
-    .getGlobalBadges()
-    .then((data) => {
-      for (const badge of data) {
-        cached_badges.add(badge.set_id, badge);
-      }
-      return data;
-    })
+  return await twhttp.getGlobalBadges().then((data) => {
+    for (const badge of data) {
+      cached_badges.add(badge.set_id, badge);
+    }
+    return data;
+  });
 }
 exports.refreshCache = refreshCache;
 
@@ -40,4 +38,3 @@ function getCachedBadge(set, version) {
   return null;
 }
 exports.getCachedBadge = getCachedBadge;
-
