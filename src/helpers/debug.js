@@ -116,7 +116,7 @@ exports.log = (message, ...args) => {
 };
 
 exports.info = () => ({
-  name: process.env.npm_package_name,
-  version: process.env.npm_package_version,
+  name: process.env.npm_package_name || "<unknown>",
+  version: process.env.npm_package_version || "<unknown>",
   debug: enabled()
 });

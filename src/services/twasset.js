@@ -2,61 +2,82 @@ const debug = require("#helpers/debug").create("twasset");
 
 const responses = require("#helpers/responses");
 const cache = require("#helpers/cache");
-
 const twhttp = require("#helpers/twitch/http");
 const twbadge = require("#helpers/twitch/badge");
 
-exports.authenticate = twhttp.authenticate;
-
+/* Refresh the cache from Twitch. This is done on every startup */
 async function initialize() {
-  twbadge.refreshCache();
+  return await twbadge.badge_cache.refresh();
 }
-exports.initialize = initialize;
 
-/* Get a badge for a specific user ID */
-exports.getBadgesFor = (req, res) => {
-  twbadge
-    .getUserBadges(req.params.broadcaster)
+/* Get all custom badges for a specific login/username */
+function getBadgesFor(req, res) {
+  twhttp
+    .getBadgesFor(req.params.broadcaster)
     .then((data) => {
-      res.status(200).send(data.data);
+      console.log(data);
+      res.status(200).send(data);
     })
     .catch((err) => {
       res.status(500).send(err);
     });
-};
+}
+
+/* Get a user's custom badges by set name */
+function getBadgeSetFor(req, res) {
+  res.status(400).send({ message: "Not yet implemented" });
+}
+
+/* Get a user's custom badges by set and version */
+function getBadgeFor(req, res) {
+  res.status(400).send({ message: "Not yet implemented" });
+}
+
+/* Get the URL for a user's custom badge */
+function getBadgeUrlFor(req, res) {
+  res.status(400).send({ message: "Not yet implemented" });
+}
 
 /* Get global badges */
-exports.getBadges = (req, res) => {
+function getBadges(req, res) {
   res.status(200).send({
-    data: twbadge.cached_badges.values()
+    data: twbadge.badge_cache.values()
   });
-};
+}
 
 /* Get global badges by set name */
-exports.getBadgeSet = (req, res) => {
+function getBadgeSet(req, res) {
   const set = req.params.set;
-  if (twbadge.cached_badges.has(set)) {
-    res.status(200).send({ data: twbadge.cached_badges.get(set) });
+  if (twbadge.badge_cache.has(set)) {
+    res.status(200).send({
+      data: twbadge.badge_cache.get(set)
+    });
   } else {
-    res.status(404).send({ message: `Unknown set ID "${set}"` });
+    res.status(404).send({
+      message: `Unknown set ID "${set}"`
+    });
   }
-};
+}
 
 /* Get a specific badge */
-exports.getBadge = (req, res) => {
+function getBadge(req, res) {
   const set = req.params.set;
   const version = req.params.version;
 
   const result = twbadge.getCachedBadge(set, version);
   if (result !== null) {
-    res.status(200).send({ data: result });
+    res.status(200).send({
+      data: result
+    });
   } else {
-    res.status(404).send({ message: `Badge ${set}/${version} not found` });
+    res.status(404).send({
+      message: `Badge ${set}/${version} not found`
+    });
   }
-};
+}
 
 /* Get a specific badge's URL */
-exports.getBadgeUrl = (req, res) => {
+function getBadgeUrl(req, res) {
   const set = req.params.set;
   const version = req.params.version;
   let size = req.params.size || "image_url_1x";
@@ -69,18 +90,28 @@ exports.getBadgeUrl = (req, res) => {
     if (badge.hasOwnProperty(size)) {
       res.status(200).send(badge[size]);
     } else {
-      res.status(404).send({ message: `Badge ${set}/${version} lacks size ${size}` });
+      res.status(404).send({
+        message: `Badge ${set}/${version} lacks size ${size}`
+      });
     }
   } else {
-    res.status(404).send({ message: `Badge ${set}/${version} not found` });
+    res.status(404).send({
+      message: `Badge ${set}/${version} not found`
+    });
   }
-};
+}
 
-exports.getBadgeDebug = (req, res) => {
-  debug("%o", badge_cache);
-  res.status(200).send({});
-};
-
-exports.getEmote = responses.unimplemented();
-
-exports.getCheermote = responses.unimplemented();
+Object.assign(exports, {
+  authenticate: twhttp.authenticate,
+  initialize,
+  getBadges,
+  getBadgesFor,
+  getBadgeSet,
+  getBadgeSetFor,
+  getBadge,
+  getBadgeFor,
+  getBadgeUrl,
+  getBadgeUrlFor,
+  getEmote: responses.unimplemented(),
+  getCheermote: responses.unimplemented()
+});

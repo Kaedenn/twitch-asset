@@ -28,16 +28,29 @@ exports.getGlobalBadges = async () => {
   return data.data;
 };
 
-/* Get user's custom badges */
+/* Get user's custom badges, using a numeric user ID */
 exports.getUserBadges = async (userid) => {
-  const resp = await twauth.api.get("/helix/chat/badges", {
-    broadcaster_id: userid
-  });
+  const resp = await twauth.api.get(`/helix/chat/badges?broadcaster_id=${userid}`);
+  debug(resp.data);
   return resp.data.data;
 };
 
 /* Get information about a specific user */
-exports.getUser = async () => {
-  /* TODO */
+exports.getUser = async (login) => {
+  const resp = await twauth.api.get(`/helix/users?login=${encodeURIComponent(login)}`);
+  debug(resp.data);
+  if (resp.data.data && resp.data.data.length > 0) {
+    return resp.data.data[0];
+  }
+  return null;
+};
+
+/* Get user's custom badges, using a login/username */
+exports.getBadgesFor = async (login) => {
+  const user = await exports.getUser(login);
+  debug(user);
+  if (user !== null) {
+    return await exports.getUserBadges(user.id);
+  }
   return null;
 };

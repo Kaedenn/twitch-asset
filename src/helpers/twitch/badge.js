@@ -3,33 +3,26 @@ const debug = require("#helpers/debug").create("twasset");
 const twhttp = require("#helpers/twitch/http");
 const cache = require("#helpers/cache");
 
+/* Permitted "shorthand" sizes and their values */
 const SIZE_MAP = {
   "1x": "image_url_1x",
   "2x": "image_url_2x",
   "4x": "image_url_4x"
 };
-exports.SIZE_MAP = SIZE_MAP;
 
-const cached_badges = new cache.Cache("badges", async function (name, rules) {
-  debug(`Loading cache for ${name}`);
-  return {};
+/* Cache object for storing badge data */
+const badge_cache = new cache.Cache("badges", async function (name, rules) {
+  debug(`Refreshing cache ${name} from Twitch...`);
+  const badge_info = await twhttp.getGlobalBadges();
+  const entries = badge_info.map((badge) => [badge.set_id, badge]);
+  const data = Object.fromEntries(entries);
+  debug(`Refreshed cache ${name}: ${Object.keys(data).length} items`);
+  return data;
 });
-cached_badges.init();
-exports.cached_badges = cached_badges;
-
-async function refreshCache() {
-  return await twhttp.getGlobalBadges().then((data) => {
-    for (const badge of data) {
-      cached_badges.add(badge.set_id, badge);
-    }
-    return data;
-  });
-}
-exports.refreshCache = refreshCache;
 
 function getCachedBadge(set, version) {
-  if (cached_badges.has(set)) {
-    for (const badge_version of cached_badges.get(set).versions) {
+  if (badge_cache.has(set)) {
+    for (const badge_version of badge_cache.get(set).versions) {
       if (badge_version.id === version) {
         return badge_version;
       }
@@ -37,4 +30,9 @@ function getCachedBadge(set, version) {
   }
   return null;
 }
-exports.getCachedBadge = getCachedBadge;
+
+Object.assign(exports, {
+  SIZE_MAP,
+  badge_cache,
+  getCachedBadge
+});

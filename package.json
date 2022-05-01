@@ -22,7 +22,7 @@
     "dev": "nodemon ./src/index.js",
     "lint": "prettier --config=.prettierrc \"**/*.*\" --write --ignore-unknown",
     "pre-commit": "lint-staged",
-    "test": "mocha ./src/test"
+    "test": "mocha ./src/test --require ./src/test/init.mjs"
   },
   "repository": {
     "type": "git",

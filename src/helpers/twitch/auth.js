@@ -1,4 +1,4 @@
-const debug = require("../debug").create("twauth");
+const debug = require("#helpers/debug").create("twauth");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
@@ -98,7 +98,7 @@ exports.authenticate = () => {
     .then(() => {
       debug("Loaded authentication token from file");
       exports.api.defaults.headers.common["Authorization"] = getHeader();
-      debug("Authenticated");
+      console.log("Authenticated");
     })
     .catch((error) => {
       console.log("Failed to load token from file; trying to get a new one...");
