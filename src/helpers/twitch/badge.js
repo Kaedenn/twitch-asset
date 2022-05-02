@@ -1,4 +1,4 @@
-const debug = require("#helpers/debug").create("twasset");
+const debug = require("#helpers/debug").create("helpers/twitch/badge");
 
 const twhttp = require("#helpers/twitch/http");
 const cache = require("#helpers/cache");

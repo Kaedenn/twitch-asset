@@ -67,7 +67,7 @@ describe("global badges", function () {
 describe("streamer badges", function () {
   this.timeout(1000); /* These take a while longer */
   it("should be able to list streamer badges", async function () {
-    const response = await api.get("/badges/v0oid");
+    const response = await api.get("/user/badge/v0oid");
     assert(response.status === 200);
     assert(response.data.data.length > 0);
     const badges = badgeArrayToObject(response.data.data);
@@ -87,4 +87,7 @@ describe("streamer badges", function () {
       assert(typeof badge["image_url_1x"] === "string");
     }
   });
+  /* TODO: /user/badge/v0oid/subscriber/0 */
+  /* TODO: /user/badge/v0oid/subscriber/0/url */
+  /* TODO: /user/badge/v0oid/subscriber/0/url/1x */
 });

@@ -1,4 +1,4 @@
-const debug = require("#helpers/debug").create("cache");
+const debug = require("#helpers/debug").create("helpers/cache");
 
 const fs = require("fs/promises");
 const path = require("path");

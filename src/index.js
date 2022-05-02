@@ -51,15 +51,14 @@ app.get("/debug/dump", (req, res) => {
   res.status(200).send({});
 });
 
-process.on("SIGTERM", () => {
-  console.log("Received SIGTERM; exiting");
-  process.exit();
-});
-
-process.on("SIGINT", () => {
-  console.log("Received SIGINT; exiting");
-  process.exit();
-});
+(() => {
+  for (const signal of ["SIGTERM", "SIGINT"]) {
+    process.on(signal, () => {
+      console.log(`Received ${signal}; exiting`);
+      process.exit();
+    });
+  }
+})();
 
 process.stdin.on("readable", () => {
   let chunk;
@@ -80,8 +79,10 @@ twasset
   .then(() => {
     const port = process.env.APP_DEVSERVER_PORT || 8081;
     app.listen(port);
+    /* Used by test suite as indication to start tests */
     console.log("Application ready");
   })
   .catch((error) => {
+    /* Used by test suite as indication to abort tests */
     console.error("Application initialization failed: %o", error);
   });

@@ -1,6 +1,6 @@
 /* TODO: Handle 401 Unauthorized on requests */
 
-const debug = require("#helpers/debug").create("twhttp");
+const debug = require("#helpers/debug").create("helpers/twitch/http");
 const axios = require("axios");
 
 const twauth = require("#helpers/twitch/auth");

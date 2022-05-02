@@ -1,4 +1,4 @@
-const debug = require("#helpers/debug").create("twauth");
+const debug = require("#helpers/debug").create("helpers/twitch/auth");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
