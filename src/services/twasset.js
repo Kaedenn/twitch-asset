@@ -15,8 +15,7 @@ function getBadgesFor(req, res) {
   twhttp
     .getBadgesFor(req.params.broadcaster)
     .then((data) => {
-      console.log(data);
-      res.status(200).send(data);
+      res.status(200).send({ data: data });
     })
     .catch((err) => {
       res.status(500).send(err);
@@ -25,7 +24,28 @@ function getBadgesFor(req, res) {
 
 /* Get a user's custom badges by set name */
 function getBadgeSetFor(req, res) {
-  res.status(400).send({ message: "Not yet implemented" });
+  const set = req.params.set;
+  twhttp
+    .getBadgesFor(req.params.broadcaster)
+    .then((data) => {
+      for (const badge of data) {
+        if (badge.set_id === set) {
+          return badge;
+        }
+      }
+    })
+    .then((badge) => {
+      if (badge !== null) {
+        res.status(200).send({ data: badge });
+      } else {
+        res.status(404).send({
+          message: `Badge set ${set} for user ${user} not found`
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
 }
 
 /* Get a user's custom badges by set and version */
