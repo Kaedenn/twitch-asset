@@ -22,6 +22,10 @@ The intent is to provide functionality Twitch should provide, seeing how they al
 <img title="Subscriber" href="http://localhost:8081/badge/subscriber/0/url/1x" />
 ```
 
+# What this application is not
+
+This application does not make request on behalf of any specific user. The access token it uses is not _your_ access token; it can be considered anonymous. Therefore, this is not a specific user's chat bot.
+
 # Response structure
 
 This application mostly serves JSON, except for the specific endpoints that serve text.
@@ -129,17 +133,36 @@ Not yet implemented.
 I highly recommend you use this endpoint locally. You will need to add a Twitch extension and configure this endpoint with the values you receive. Follow these steps to do that:
 
 1. Register a new Twitch application.
-   1.1) Go to [https://dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps).
-   1.2) Click "Register Your Application".
-   1.3) Give your application a name.
-   1.4) Configure the endpoint to be `http://localhost:8081`. Feel free to change the port number if desired. You should not use a port number less than 1024.
-   1.5) Select any category that makes sense. I selected "Website Integration".
-   1.6) Make note of your Client ID.
-   1.7) Generate a new client secret and make note of the value. This value will appear once and you cannot view it again without generating a new one. Therefore, copy it somewhere safe and secure (such as a password manager).
+   i. Go to [https://dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps).
+   ii. Click "Register Your Application".
+   iii. Give your application a name.
+   iv. Configure the endpoint to be `http://localhost:8081`. Feel free to change the port number if desired. You should not use a port number less than 1024.
+   v. Select any category that makes sense. I selected "Website Integration".
+   vi. Make note of your Client ID.
+   vii. Generate a new client secret and make note of the value. This value will appear once and you cannot view it again without generating a new one. Therefore, copy it somewhere safe and secure (such as a password manager).
 2. Configure this application to use your Client ID and client secret.
-   2.1) Copy or rename `.env.sample` to `.env`.
-   2.2) Edit `.env` and replace `APP_CLIENTID` and `APP_SECRET` with the values you obtained above. Feel free to change the port number if desired.
-   2.3) Run `npm install` if you haven't already.
-   2.4) Run `npm run start`.
+   i. Copy or rename `.env.sample` to `.env`.
+   ii. Edit `.env` and replace `APP_CLIENTID` and `APP_SECRET` with the values you obtained above. Feel free to change the port number if desired.
+   iii. Run `npm install` if you haven't already.
+   iv. Run `npm run start`.
 
 You can now run `npm test` to ensure the endpoint works properly.
+
+# Bugs and other issues
+
+There are consistency issues with response HTTP status codes. Certain problems (such as failure to authenticate with Twitch, failures querying the Twitch API due to token issues, etc) that don't always use the proper HTTP status code.
+
+Response status and message fields are inconsistent; some APIs have a `success` field, some have a `message` field, some have both, and some have neither.
+
+# Future work
+
+I want to implement the following things:
+
+1. Authorization to send requests on behalf of a specific user
+2. HTTPS
+  2.1. Certificate location should be configurable.
+  2.2. Generate a self-signed certificate if no other certificate is found.
+3. Administrative interface (perhaps via ejs or vue) locked behind `https://localhost` access
+  3.1. Perhaps configure "host whitelist" of users allowed to access the interface.
+  3.2. Allow for refreshing the access token via this administrative interface.
+
