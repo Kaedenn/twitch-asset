@@ -133,18 +133,18 @@ Not yet implemented.
 I highly recommend you use this endpoint locally. You will need to add a Twitch extension and configure this endpoint with the values you receive. Follow these steps to do that:
 
 1. Register a new Twitch application.
-   i. Go to [https://dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps).
-   ii. Click "Register Your Application".
-   iii. Give your application a name.
-   iv. Configure the endpoint to be `http://localhost:8081`. Feel free to change the port number if desired. You should not use a port number less than 1024.
-   v. Select any category that makes sense. I selected "Website Integration".
-   vi. Make note of your Client ID.
-   vii. Generate a new client secret and make note of the value. This value will appear once and you cannot view it again without generating a new one. Therefore, copy it somewhere safe and secure (such as a password manager).
+   - Go to [https://dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps).
+   - Click "Register Your Application".
+   - Give your application a name.
+   - Configure the endpoint to be `http://localhost:8081`. Feel free to change the port number if desired. You should not use a port number less than 1024.
+   - Select any category that makes sense. I selected "Website Integration".
+   - Make note of your Client ID.
+   - Generate a new client secret and make note of the value. This value will appear once and you cannot view it again without generating a new one. Therefore, copy it somewhere safe and secure (such as a password manager).
 2. Configure this application to use your Client ID and client secret.
-   i. Copy or rename `.env.sample` to `.env`.
-   ii. Edit `.env` and replace `APP_CLIENTID` and `APP_SECRET` with the values you obtained above. Feel free to change the port number if desired.
-   iii. Run `npm install` if you haven't already.
-   iv. Run `npm run start`.
+   - Copy or rename `.env.sample` to `.env`.
+   - Edit `.env` and replace `APP_CLIENTID` and `APP_SECRET` with the values you obtained above. Feel free to change the port number if desired.
+   - Run `npm install` if you haven't already.
+   - Run `npm run start`.
 
 You can now run `npm test` to ensure the endpoint works properly.
 
@@ -160,9 +160,9 @@ I want to implement the following things:
 
 1. Authorization to send requests on behalf of a specific user
 2. HTTPS
-  2.1. Certificate location should be configurable.
-  2.2. Generate a self-signed certificate if no other certificate is found.
+  - Certificate location should be configurable.
+  - Generate a self-signed certificate if no other certificate is found.
 3. Administrative interface (perhaps via ejs or vue) locked behind `https://localhost` access
-  3.1. Perhaps configure "host whitelist" of users allowed to access the interface.
-  3.2. Allow for refreshing the access token via this administrative interface.
+  - Perhaps configure "host whitelist" of users allowed to access the interface.
+  - Allow for refreshing the access token via this administrative interface.
 
