@@ -1,3 +1,12 @@
+/**
+ * App Access Tokens via Client Credentials grant flow
+ *
+ * This module handles Twitch's Client Credentials system by requesting an App
+ * Access Token using the https://id.twitch.tv/oauth2/token endpoint. This uses
+ * the client secret (which must be defined in the .env file) to request the
+ * token.
+ *
+ */
 const debug = require("#helpers/debug").create("helpers/twitch/auth");
 const fs = require("fs");
 const path = require("path");
@@ -14,7 +23,7 @@ const access = {
   token_type: null
 };
 
-/* Local access token */
+/* Local access token storage */
 const prefix = io.dataPath();
 exports.AUTH_FILE = "token.json";
 exports.AUTH_FILE_PATH = path.join(prefix, exports.AUTH_FILE);
@@ -90,7 +99,8 @@ async function loadTokenFromFile() {
     });
 }
 
-/* Load the access token (or create a new one) and place it into the axios API
+/**
+ * Load the access token (or create a new one) and place it into the axios API
  * object. This function must be called before API requests can be made.
  */
 exports.authenticate = () => {

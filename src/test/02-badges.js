@@ -87,6 +87,18 @@ describe("streamer badges", function () {
       assert(typeof badge["image_url_1x"] === "string");
     }
   });
+  it("should be resilient to invalid logins", async function () {
+    let failed = false;
+    try {
+      await api.get("/user/badge/_");
+    }
+    catch (err) {
+      assert(err.response.status === 404);
+      failed = true;
+    }
+    assert(failed);
+  });
+
   /* TODO: /user/badge/v0oid/subscriber/0 */
   /* TODO: /user/badge/v0oid/subscriber/0/url */
   /* TODO: /user/badge/v0oid/subscriber/0/url/1x */

@@ -4,6 +4,7 @@ const responses = require("#helpers/responses");
 const cache = require("#helpers/cache");
 const twhttp = require("#helpers/twitch/http");
 const twbadge = require("#helpers/twitch/badge");
+const twerrors = require("#helpers/twitch/errors");
 
 /* Refresh the cache from Twitch. This is done on every startup */
 async function initialize() {
@@ -14,12 +15,20 @@ async function initialize() {
 /* Get all custom badges for a specific login/username */
 function getBadgesFor(req, res) {
   twhttp
-    .getBadgesFor(req.params.broadcaster)
+    .getUser(req.params.broadcaster)
+    .then((data) => {
+      if (data.id) {
+        return twhttp.getUserBadges(data.id);
+      } else {
+        throw new twerrors.UserNotFoundError(req.params.broadcaster);
+      }
+    })
     .then((data) => {
       res.status(200).send({ data: data });
     })
     .catch((err) => {
-      res.status(500).send(err);
+      const [status, message] = twerrors.getStatusFor(err);
+      res.status(status).send({ message: message });
     });
 }
 
@@ -46,7 +55,8 @@ function getBadgeSetFor(req, res) {
       }
     })
     .catch((err) => {
-      res.status(500).send(err);
+      const [status, message] = twerrors.getStatusFor(err);
+      res.status(status).send({ message: message });
     });
 }
 

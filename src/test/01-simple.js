@@ -16,4 +16,23 @@ describe("endpoint is available", function () {
     const data = response.data;
     assert(data.success === true);
   });
+
+  it("should respond to user queries", async function () {
+    const response = await api.get("/user/kaedenn_");
+    assert(response.status === 200);
+    const data = response.data;
+    assert(data.data.login === "kaedenn_");
+  });
+
+  it("should be resilient to invalid users", async function () {
+    let failed = false;
+    try {
+      await api.get("/user/_");
+    }
+    catch (err) {
+      assert(err.response.status === 404);
+      failed = true;
+    }
+    assert(failed);
+  });
 });

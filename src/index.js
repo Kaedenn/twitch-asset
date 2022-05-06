@@ -13,6 +13,8 @@ const debug = debugHelper.create("index");
 
 const status = require("#services/status");
 const twasset = require("#services/twasset");
+const twuser = require("#services/user");
+const twerrors = require("#helpers/twitch/errors");
 
 const app = express();
 const corsOptions = {
@@ -33,6 +35,7 @@ app.get("/status", status.getStatus);
 
 app.get("/badges", twasset.getBadges);
 app.get("/badges/:broadcaster", twasset.getBadgesFor);
+app.get("/user/:login", twuser.getUser);
 app.get("/user/badge/:broadcaster", twasset.getBadgesFor);
 app.get("/user/badge/:broadcaster/:set", twasset.getBadgeSetFor);
 app.get("/user/badge/:broadcaster/:set/:version", twasset.getBadgeFor);
