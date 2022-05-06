@@ -29,8 +29,7 @@ exports.getUser = async (login) => {
       return resp.data.data[0];
     }
     return null;
-  }
-  catch (err) {
+  } catch (err) {
     if (axios.isAxiosError(err)) {
       const data = err.response.data;
       if (data.status === 400 && data.message.match(/invalid.*id/i)) {
@@ -55,8 +54,7 @@ exports.getUserBadges = async (userid) => {
   try {
     const resp = await twauth.api.get(`/helix/chat/badges?broadcaster_id=${userid}`);
     return resp.data.data;
-  }
-  catch (err) {
+  } catch (err) {
     if (axios.isAxiosError(err)) {
       const data = err.response.data;
       if (data.status === 400 && data.message.match(/invalid.*id/i)) {

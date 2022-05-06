@@ -11,7 +11,7 @@ const SIZE_MAP = {
 };
 
 /* Cache object for storing badge data */
-const badge_cache = new cache.Cache("badges", async function (name, rules) {
+const badge_cache = new cache.Cache("badges", async function (name /*, rules*/) {
   debug(`Refreshing cache ${name} from Twitch...`);
   const badge_info = await twhttp.getGlobalBadges();
   const entries = badge_info.map((badge) => [badge.set_id, badge]);

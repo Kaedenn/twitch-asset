@@ -1,4 +1,6 @@
-const debug = require("#helpers/debug").create("services/asset");
+/*
+ * const debug = require("#helpers/debug").create("services/asset");
+ */
 
 const twbadge = require("./badge");
 Object.assign(exports, twbadge);

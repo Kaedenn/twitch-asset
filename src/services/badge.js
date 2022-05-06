@@ -1,7 +1,5 @@
 const debug = require("#helpers/debug").create("services/badge");
 
-const responses = require("#helpers/responses");
-const cache = require("#helpers/cache");
 const twhttp = require("#helpers/twitch/http");
 const twbadge = require("#helpers/twitch/badge");
 const twerrors = require("#helpers/twitch/errors");
@@ -119,7 +117,7 @@ function getBadgeUrl(req, res) {
 
   const badge = twbadge.getCachedBadge(set, version);
   if (badge !== null) {
-    if (badge.hasOwnProperty(size)) {
+    if (Object.prototype.hasOwnProperty.call(badge, size)) {
       res.status(200).send(badge[size]);
     } else {
       res.status(404).send({

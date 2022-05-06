@@ -1,9 +1,6 @@
 const debug = require("#helpers/debug").create("services/badge");
 
-const responses = require("#helpers/responses");
-const cache = require("#helpers/cache");
 const twhttp = require("#helpers/twitch/http");
-const twbadge = require("#helpers/twitch/badge");
 const twerrors = require("#helpers/twitch/errors");
 
 /* Refresh the cache from Twitch. This is done on every startup */

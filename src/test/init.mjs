@@ -44,7 +44,7 @@ async function startService() {
   });
 }
 
-let service = null;
+export let service = null;
 
 export const mochaHooks = {
   async beforeAll() {

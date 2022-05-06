@@ -1,5 +1,4 @@
 const fs = require("fs/promises");
-const path = require("path");
 
 function dataPath() {
   let path = process.env.APP_DATA_PATH;
@@ -30,5 +29,5 @@ exports.readJSON = (path) => {
 };
 
 exports.writeJSON = (path, data) => {
-  return writeJSON(path);
+  return writeJSON(path, data);
 };

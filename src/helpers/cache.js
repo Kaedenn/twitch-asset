@@ -2,7 +2,6 @@ const debug = require("#helpers/debug").create("helpers/cache");
 
 const fs = require("fs/promises");
 const path = require("path");
-const os = require("os");
 
 const io = require("#helpers/io");
 
@@ -15,7 +14,7 @@ async function isDirectory(pathname) {
   return await fs
     .stat(pathname)
     .then((stat) => stat.isDirectory())
-    .catch((err) => false);
+    .catch(() => false);
 }
 exports.isDirectory = isDirectory;
 
@@ -51,7 +50,7 @@ class Cache {
 
   /* Add a key and value. Raises an Error if the key is already present */
   add(key, value) {
-    if (this._data.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(this._data, key)) {
       throw new Error(`Cannot add "${key}" with value "${value}"; entry exists`);
     }
     this._data[key] = value;
@@ -64,7 +63,7 @@ class Cache {
 
   /* Returns true if the cache contains the given key, false otherwise */
   has(key) {
-    return this._data.hasOwnProperty(key);
+    return Object.prototype.hasOwnProperty.call(this._data, key);
   }
 
   /* Get the given key's value. Raises an Error if the key isn't present */

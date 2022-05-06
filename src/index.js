@@ -14,7 +14,6 @@ const debug = debugHelper.create("index");
 const status = require("#services/status");
 const twasset = require("#services/twasset");
 const twuser = require("#services/user");
-const twerrors = require("#helpers/twitch/errors");
 
 const app = express();
 const corsOptions = {
@@ -58,7 +57,7 @@ app.get("/debug/dump", (req, res) => {
   for (const signal of ["SIGTERM", "SIGINT"]) {
     process.on(signal, () => {
       console.log(`Received ${signal}; exiting`);
-      process.exit();
+      process.exit(0);
     });
   }
 })();
@@ -73,7 +72,7 @@ process.stdin.on("readable", () => {
 
 process.stdin.on("end", () => {
   console.log(`Reached EOF on stdin`);
-  process.exit();
+  process.exit(0);
 });
 
 twasset

@@ -1,4 +1,6 @@
-const debug = require("#helpers/debug").create("helpers/twitch/errors");
+/* Available for future use
+ * const debug = require("#helpers/debug").create("helpers/twitch/errors");
+ */
 
 class TwitchError extends Error {
   constructor(message) {
@@ -24,7 +26,7 @@ class ObjectNotFoundError extends TwitchError {
 
 class UserNotFoundError extends ObjectNotFoundError {
   constructor(user, message = null) {
-    const msg = `User "${user}" not found`;
+    let msg = `User "${user}" not found`;
     if (message !== null) {
       msg += ": " + message;
     }
@@ -38,7 +40,7 @@ class UserNotFoundError extends ObjectNotFoundError {
 
 class BadgeNotFoundError extends ObjectNotFoundError {
   constructor(badge, message = null) {
-    const msg = `Badge "${badge}" not found`;
+    let msg = `Badge "${badge}" not found`;
     if (message !== null) {
       msg += ": " + message;
     }

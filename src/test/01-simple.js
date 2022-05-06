@@ -28,8 +28,7 @@ describe("endpoint is available", function () {
     let failed = false;
     try {
       await api.get("/user/_");
-    }
-    catch (err) {
+    } catch (err) {
       assert(err.response.status === 404);
       failed = true;
     }

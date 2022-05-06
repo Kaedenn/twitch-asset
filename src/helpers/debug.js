@@ -1,4 +1,3 @@
-const path = require("path");
 const createDebug = require("debug");
 exports.createDebug = createDebug;
 

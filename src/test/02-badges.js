@@ -26,21 +26,21 @@ describe("global badges", function () {
     const response = await api.get("/badges");
     assert(response.status === 200);
     const badges = badgeArrayToObject(response.data.data);
-    assert(badges.hasOwnProperty("subscriber/1"));
-    assert(badges["subscriber/1"].hasOwnProperty("image_url_1x"));
+    assert(Object.prototype.hasOwnProperty.call(badges, "subscriber/1"));
+    assert(Object.prototype.hasOwnProperty.call(badges["subscriber/1"], "image_url_1x"));
   });
   it("should provide specific global badge", async function () {
     const response = await api.get("/badge/subscriber/1");
     const badge = response.data.data;
     assert(response.status === 200);
-    assert(badge.hasOwnProperty("image_url_1x"));
+    assert(Object.prototype.hasOwnProperty.call(badge, "image_url_1x"));
   });
   it("should provide specific global badges", async function () {
     const response = await api.get("/badge/subscriber");
     const badges = badgeArrayToObject([response.data.data]);
     assert(response.status === 200);
-    assert(badges.hasOwnProperty("subscriber/1"));
-    assert(badges["subscriber/1"].hasOwnProperty("image_url_1x"));
+    assert(Object.prototype.hasOwnProperty.call(badges, "subscriber/1"));
+    assert(Object.prototype.hasOwnProperty.call(badges["subscriber/1"], "image_url_1x"));
     assert(badges["subscriber/1"]["image_url_1x"]);
     assert(typeof badges["subscriber/1"]["image_url_1x"] === "string");
   });
@@ -72,8 +72,8 @@ describe("streamer badges", function () {
     assert(response.data.data.length > 0);
     const badges = badgeArrayToObject(response.data.data);
     assert(Object.entries(badges).length >= response.data.data.length);
-    for (const [name, badge] of Object.entries(badges)) {
-      assert(badge.hasOwnProperty("image_url_1x"));
+    for (const badge of Object.values(badges)) {
+      assert(Object.prototype.hasOwnProperty.call(badge, "image_url_1x"));
       assert(typeof badge["image_url_1x"] === "string");
     }
   });
@@ -82,8 +82,8 @@ describe("streamer badges", function () {
     assert(response.status === 200);
     const badges = badgeArrayToObject([response.data.data]);
     assert(Object.entries(badges).length > 0);
-    for (const [name, badge] of Object.entries(badges)) {
-      assert(badge.hasOwnProperty("image_url_1x"));
+    for (const badge of Object.values(badges)) {
+      assert(Object.prototype.hasOwnProperty.call(badge, "image_url_1x"));
       assert(typeof badge["image_url_1x"] === "string");
     }
   });
@@ -91,8 +91,7 @@ describe("streamer badges", function () {
     let failed = false;
     try {
       await api.get("/user/badge/_");
-    }
-    catch (err) {
+    } catch (err) {
       assert(err.response.status === 404);
       failed = true;
     }

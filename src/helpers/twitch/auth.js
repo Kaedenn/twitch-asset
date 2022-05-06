@@ -8,7 +8,6 @@
  *
  */
 const debug = require("#helpers/debug").create("helpers/twitch/auth");
-const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 
@@ -111,6 +110,7 @@ exports.authenticate = () => {
       console.log("Authenticated");
     })
     .catch((error) => {
+      debug("authenticate(): received error %o", error);
       console.log("Failed to load token from file; trying to get a new one...");
       return getNewToken(true);
     });
