@@ -5,6 +5,7 @@
  */
 class TimeoutPromise extends Promise {
   constructor(timeout, callback) {
+    /* Allow for invocation both with and without the timeout argument */
     const haveTimeout = typeof timeout === "number";
     const init = haveTimeout ? callback : timeout;
     super((resolve, reject) => {
@@ -29,8 +30,7 @@ class TimeoutPromise extends Promise {
   }
   static resolveWithTimeout(timeout, x) {
     if (!x || typeof x.then !== "function") {
-      // `x` isn't a thenable, no need for the timeout,
-      // fulfill immediately
+      /* fulfill immediately if x isn't "thenable" */
       return this.resolve(x);
     }
     return new this(timeout, x.then.bind(x));

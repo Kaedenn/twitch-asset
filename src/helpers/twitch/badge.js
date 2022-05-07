@@ -10,6 +10,14 @@ const SIZE_MAP = {
   "4x": "image_url_4x"
 };
 
+function badgeSetToObject(badge_set) {
+  const versions = {};
+  for (const version of badge_set.versions) {
+    versions[version.id] = version;
+  }
+  return versions;
+}
+
 /* Cache object for storing badge data */
 const badge_cache = new cache.Cache("badges", async function (name /*, rules*/) {
   debug(`Refreshing cache ${name} from Twitch...`);
@@ -33,6 +41,7 @@ function getCachedBadge(set, version) {
 
 Object.assign(exports, {
   SIZE_MAP,
+  badgeSetToObject,
   badge_cache,
   getCachedBadge
 });

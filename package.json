@@ -46,6 +46,7 @@
     "#helpers/debug": "./src/helpers/debug.js",
     "#helpers/*": "./src/helpers/*.js",
     "#helpers/twitch/*": "./src/helpers/twitch/*.js",
+    "#services/badge/*": "./src/services/badge/*.js",
     "#services/*": "./src/services/*.js"
   }
 }
