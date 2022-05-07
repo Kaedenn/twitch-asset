@@ -160,9 +160,9 @@ I want to implement the following things:
 
 1. Authorization to send requests on behalf of a specific user
 2. HTTPS
-  - Certificate location should be configurable.
-  - Generate a self-signed certificate if no other certificate is found.
+   - Certificate location should be configurable.
+   - Generate a self-signed certificate if no other certificate is found.
 3. Administrative interface (perhaps via ejs or vue) locked behind `https://localhost` access
-  - Perhaps configure "host whitelist" of users allowed to access the interface.
-  - Allow for refreshing the access token via this administrative interface.
+   - Perhaps configure "host whitelist" of users allowed to access the interface.
+   - Allow for refreshing the access token via this administrative interface.
 
