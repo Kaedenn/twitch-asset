@@ -1,7 +1,5 @@
 const assert = require("assert");
 const axios = require("axios");
-const dotenv = require("dotenv");
-dotenv.config();
 
 function badgeArrayToObject(badges) {
   const result = {};

@@ -1,7 +1,4 @@
 const assert = require("assert");
-const axios = require("axios");
-const dotenv = require("dotenv");
-dotenv.config();
 
 describe("user operations", function () {
   /* These take a while longer */

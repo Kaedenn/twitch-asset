@@ -8,8 +8,8 @@
  *
  */
 const debug = require("#helpers/debug").create("helpers/twitch/auth");
-const path = require("path");
 const axios = require("axios");
+const path = require("path");
 
 const io = require("#helpers/io");
 const strutil = require("#helpers/string");
@@ -23,9 +23,7 @@ const access = {
 };
 
 /* Local access token storage */
-const prefix = io.dataPath();
 exports.AUTH_FILE = "token.json";
-exports.AUTH_FILE_PATH = path.join(prefix, exports.AUTH_FILE);
 
 /* Authenticated API (Authorization header added below) */
 exports.api = axios.create({
@@ -46,6 +44,11 @@ exports.expireDate = () => {
   return null;
 };
 
+/* Path to the file containing the access token */
+function tokenFilePath() {
+  return path.join(io.dataPath(), exports.AUTH_FILE);
+}
+
 /* Format the current token as an Authorization header */
 function getHeader() {
   return `${access.token_type} ${access.access_token}`;
@@ -58,23 +61,26 @@ async function getNewToken(writeFile = true) {
     client_secret: process.env.APP_SECRET,
     grant_type: "client_credentials"
   });
-  if (resp.data) {
+  if (resp.data && resp.data.access_token) {
     const data = resp.data;
-    access.access_token = data.token;
+    access.access_token = data.access_token;
     access.date = Date.now();
     access.expires_in = data.expires_in;
     access.token_type = strutil.toTitleCase(data.token_type);
     if (writeFile) {
-      await io.writeJSON(exports.AUTH_FILE_PATH, access);
+      debug("Writing new token to %s", tokenFilePath());
+      await io.writeJSON(tokenFilePath(), access);
     }
+    return access;
   }
 }
 
 /* (Attempt to) read the token from the local file */
 async function loadTokenFromFile() {
-  return io
-    .readJSON(exports.AUTH_FILE_PATH)
-    .then((data) => {
+  await io.maybeMakeDirectory(io.dataPath());
+  try {
+    const data = await io.readJSON(tokenFilePath());
+    if (data && data.access_token) {
       access.access_token = data.access_token;
       access.date = data.date || Date.now();
       access.expires_in = data.expires_in;
@@ -87,31 +93,57 @@ async function loadTokenFromFile() {
         exports.expireDate()
       );
       return access;
-    })
-    .catch((error) => {
-      if (error.code != "ENOENT") {
-        console.error("Failed reading %s: %o", exports.AUTH_FILE_PATH, error);
-      } else {
-        debug("Auth file %s does not exist", exports.AUTH_FILE_PATH);
-      }
-      throw error;
-    });
+    }
+  } catch (err) {
+    if (err.code == "ENOENT") {
+      debug("Token file %s does not exist", tokenFilePath());
+    } else {
+      console.error("Failed reading %s: %o", tokenFilePath(), err);
+      console.error("Falling back to generating a new one");
+    }
+  }
+  return null;
 }
 
 /**
  * Load the access token (or create a new one) and place it into the axios API
  * object. This function must be called before API requests can be made.
  */
-exports.authenticate = () => {
-  return loadTokenFromFile()
-    .then(() => {
-      debug("Loaded authentication token from file");
-      exports.api.defaults.headers.common["Authorization"] = getHeader();
-      console.log("Authenticated");
-    })
-    .catch((error) => {
-      debug("authenticate(): received error %o", error);
-      console.log("Failed to load token from file; trying to get a new one...");
-      return getNewToken(true);
+exports.authenticate = async function authenticate() {
+  let data = null;
+  try {
+    data = await loadTokenFromFile();
+    if (data === null) {
+      console.log("Failed reading token from file; generating a new one");
+      data = await getNewToken(true);
+    }
+    if (data === null) {
+      throw new Error("Failed to get auth token");
+    }
+  } catch (err) {
+    console.error("Failed to authenticate(): %o", err);
+    throw err;
+  }
+  exports.api.defaults.headers.common["Authorization"] = getHeader();
+  console.log("Authenticated");
+  return data;
+};
+
+/* Validate the token against Twitch */
+exports.validate = async function validate() {
+  try {
+    const resp = await axios({
+      method: "get",
+      url: "https://id.twitch.tv/oauth2/validate",
+      headers: {
+        Authorization: getHeader()
+      }
     });
+    if (resp.status === 200) {
+      return true;
+    }
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };

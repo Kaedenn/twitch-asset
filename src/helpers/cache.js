@@ -9,15 +9,6 @@ const io = require("#helpers/io");
 const CACHE_PATH = path.join(io.dataPath(), "cache");
 exports.CACHE_PATH = CACHE_PATH;
 
-/* Is the given path a directory? */
-async function isDirectory(pathname) {
-  return await fs
-    .stat(pathname)
-    .then((stat) => stat.isDirectory())
-    .catch(() => false);
-}
-exports.isDirectory = isDirectory;
-
 /**
  * Cache manager class
  *
@@ -158,7 +149,7 @@ class Cache {
 
   /* Save the cache to disk */
   async save() {
-    if ((await isDirectory(CACHE_PATH)) === false) {
+    if ((await io.isDirectory(CACHE_PATH)) === false) {
       await fs.mkdir(CACHE_PATH);
     }
     const fh = await fs.open(this.path, "w");

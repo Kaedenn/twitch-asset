@@ -102,6 +102,14 @@ Responds `HTTP 200 OK` with the following payload:
 { success: true }
 ```
 
+### `GET /validate`
+
+Validates the access token against Twitch. Responds `HTTP 200 OK` on success with the following payload:
+
+```
+{ success: true, message: "validated" }
+```
+
 ### `GET /debug`
 
 Responds `HTTP 200 OK` if debugging is enabled, `HTTP 400 Bad Request` otherwise. Payloads are either `{ success: true }` or `{ success: false, message: "Bad Request" }`.
@@ -227,11 +235,9 @@ Response status and message fields are inconsistent; some APIs have a `success` 
 
 I want to implement the following things:
 
-1. Authorization to send requests on behalf of a specific user
-2. HTTPS
-   - Certificate location should be configurable.
-   - Generate a self-signed certificate if no other certificate is found.
-3. Administrative interface (perhaps via ejs or vue) locked behind `https://localhost` access
-   - Perhaps configure "host whitelist" of users allowed to access the interface.
-   - Allow for refreshing the access token via this administrative interface.
+- Things are getting a bit disorganized (see `index.js`). Refactor to separate responsibilities into their own modules.
+- Authorization to send requests on behalf of a specific user.
+- Administrative interface (perhaps via ejs or vue) locked behind `https://localhost` access.
+  - Perhaps configure "host whitelist" of users allowed to access the interface.
+  - Allow for refreshing the access token via this administrative interface.
 

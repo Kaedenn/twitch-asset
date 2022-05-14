@@ -1,35 +1,42 @@
-const fs = require("fs");
-const process = require("process");
-const http = require("http");
-const https = require("https");
-const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const express = require("express");
+const fs = require("fs");
+const http = require("http");
+const https = require("https");
+const path = require("path");
+const process = require("process");
 dotenv.config();
 
 if (!process.env.APP_CLIENTID) {
   throw new Error(".env file not found or missing Client ID");
 }
 
-if (!process.env.APP_HTTP_PORT) {
-  throw new Error(".env file not found or missing HTTP port");
-}
-
 const debugHelper = require("#helpers/debug");
 const debug = debugHelper.create("index");
 
+const auth = require("#services/auth");
 const status = require("#services/status");
 const twasset = require("#services/twasset");
 const twuser = require("#services/user");
 
 debug("Debugging is enabled: %o", debugHelper.info());
 
+/** TODO/FIXME
+ *
+ * Create module to handle commands on stdin.
+ * - Allow for sending requests to localhost on the proper port.
+ *
+ * Listen on both HTTP and HTTPS with protocol elevation.
+ */
+
+/* Should we use HTTPS? */
 let enable_https = false;
 const cert_info = {};
 if (process.env.APP_USE_HTTPS) {
   if (process.env.APP_KEY_FILE && process.env.APP_CRT_FILE) {
-    const key_path = __dirname + "/../" + process.env.APP_KEY_FILE;
-    const crt_path = __dirname + "/../" + process.env.APP_CRT_FILE;
+    const key_path = path.resolve(process.env.APP_KEY_FILE);
+    const crt_path = path.resolve(process.env.APP_CRT_FILE);
     try {
       const key = fs.readFileSync(key_path);
       debug("Read key file %s (%d bytes)", key_path, key.length);
@@ -39,6 +46,8 @@ if (process.env.APP_USE_HTTPS) {
       cert_info.cert = crt;
       enable_https = true;
     } catch (err) {
+      /* Failure to read cert files is not fatal; fall back to HTTP */
+      console.error("Failed to load certificates; falling back to HTTP...");
       console.error(err);
     }
   }
@@ -53,8 +62,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
   console.log("%s: %s %s", new Date().toLocaleString(), req.method, req.url);
+  /* Allow for http->https elevation */
   if (req.headers["x-forwarded-proto"] == "http") {
-    return resp.redirect(301, "https://" + req.headers.host + "/");
+    return res.redirect(301, "https://" + req.headers.host + "/");
   } else {
     return next();
   }
@@ -62,6 +72,8 @@ app.use((req, res, next) => {
 
 app.get("/", status.getHome);
 app.get("/status", status.getStatus);
+
+app.get("/validate", auth.validate);
 
 app.get("/user/:login", twuser.getUser);
 
@@ -90,10 +102,8 @@ app.get("/cheermote", twasset.getCheermote);
 
 /* Diagnostic endpoints */
 app.get("/debug", status.getDebug);
-app.get("/q", (req, res) => {
-  res.send("Using https");
-});
 
+/* Gracefully handle SIGTERM and SIGINT */
 (() => {
   for (const signal of ["SIGTERM", "SIGINT"]) {
     process.on(signal, () => {
@@ -103,40 +113,80 @@ app.get("/q", (req, res) => {
   }
 })();
 
+const commands = {};
+commands["do"] = async function () {
+  console.log("Commands:");
+  for (const command of Object.keys(commands)) {
+    if (command.startsWith("do ")) {
+      console.log("\t%s", command);
+    }
+  }
+};
+
+commands["do validate"] = async function () {
+  const twauthlib = require("#helpers/twitch/auth");
+  if (await twauthlib.validate()) {
+    console.log("Successfully validated auth token");
+  } else {
+    console.error("Failed to validate");
+  }
+};
+
+/* Allow for things sent via stdin */
 process.stdin.on("readable", () => {
   let chunk;
   while (null !== (chunk = process.stdin.read())) {
-    const lines = chunk.toString();
-    console.log(`Read ${chunk.length} bytes of data: ${lines.trimEnd()}`);
+    const lines = chunk.toString().trimEnd();
+    for (const line of lines.split(/\n/)) {
+      console.log(`Processing "%s"`, line);
+      if (line in commands) {
+        commands[line]()
+          .then((resp) => {
+            if (resp) {
+              console.log("%s: %o", line, resp);
+            }
+          })
+          .catch((err) => {
+            console.error("Error in %s: %o", line, err);
+          });
+      } else {
+        console.error("Unknown command %s", line);
+      }
+    }
   }
 });
 
+/* Exit gracefully if stdin closes */
 process.stdin.on("end", () => {
   console.log(`Reached EOF on stdin`);
   process.exit(0);
 });
 
-let http_server;
-let http_port;
-if (enable_https) {
-  http_server = https.createServer(cert_info, app);
-  http_port = process.env.APP_HTTPS_PORT;
-} else {
-  http_server = http.createServer(app);
-  http_port = process.env.APP_HTTP_PORT;
-}
+/* Primary entry point */
+async function main() {
+  /* Determine the scheme and port and create the server */
+  let http_server;
+  let http_port;
+  if (enable_https) {
+    http_server = https.createServer(cert_info, app);
+    http_port = process.env.APP_HTTPS_PORT;
+  } else {
+    http_server = http.createServer(app);
+    http_port = process.env.APP_HTTP_PORT;
+  }
 
-twasset
-  .authenticate()
-  .then(() => twasset.initialize())
-  .then(() => {
+  try {
+    await twasset.authenticate();
+    await twasset.initialize();
     http_server.listen(http_port, () => {
       debug("Listening on port %d", http_port);
       /* Used by test suite as indication to start tests */
       console.log("Application ready");
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     /* Used by test suite as indication to abort tests */
     console.error("Application initialization failed: %o", error);
-  });
+  }
+}
+
+main();
