@@ -10,7 +10,7 @@ exports.getDebug = (req, res) => {
   debug(process);
 
   if (debugHelper.enabled()) {
-    res.status(200).send({ success: true });
+    res.send({ success: true });
   } else {
     res.status(400).send({
       success: false,

@@ -2,12 +2,15 @@
  * Test suite setup script
  *
  * This script sets up some necessary utilities for testing the application.
- *
- * TODO: Allow for custom .env files.
  */
 
 import { spawn } from "child_process";
 import { TimeoutPromise } from "./util/promises.js";
+import axios from "axios";
+import dotenv from "dotenv";
+import fs from "fs";
+import https from "https";
+dotenv.config();
 
 /* Milliseconds after which the service is assumed to have failed */
 const SERVICE_TIMEOUT = 5000;
@@ -66,39 +69,66 @@ async function startService() {
   });
 }
 
-/* Reference to the child process is made available */
-export let service = null;
+/**
+ * Start the service before running any tests.
+ */
+export async function mochaGlobalSetup() {
+  try {
+    this.service = await startService();
+  } catch (err) {
+    console.error("startService() failed with error %s", err);
+    for (const child of children) {
+      child.kill("SIGKILL");
+    }
+    throw err;
+  }
+}
+
+/**
+ * Terminate the service after all tests are finished.
+ */
+export async function mochaGlobalTeardown() {
+  for (const child of children) {
+    if (!child.killed) {
+      child.kill("SIGTERM");
+      setTimeout(() => {
+        if (!child.killed) {
+          console.error("Failed to kill child with PID %d", child.pid);
+          child.kill("SIGKILL");
+        }
+      }, 1000);
+    }
+  }
+}
 
 export const mochaHooks = {
   /**
-   * Before running the test suite, start the service.
+   * Before running the test suites, connect to the service.
    */
-  async beforeAll() {
-    try {
-      service = await startService();
-    } catch (err) {
-      console.error("startService() failed with error %s", err);
-      for (const child of children) {
-        child.kill("SIGKILL");
+  beforeAll() {
+    const config = { timeout: 1000 };
+    config.baseURL = `http://localhost:${process.env.APP_HTTP_PORT}`;
+    if (process.env.APP_USE_HTTPS) {
+      config.baseURL = `https://localhost:${process.env.APP_HTTPS_PORT}`;
+      if (process.env.APP_KEY_FILE && process.env.APP_CRT_FILE) {
+        console.log("Loading cert file %s", process.env.APP_CRT_FILE);
+        const crt_path = process.env.APP_CRT_FILE;
+        config.httpsAgent = new https.Agent({
+          rejectUnauthorized: false,
+          cert: fs.readFileSync(crt_path)
+        });
       }
-      throw err;
     }
+    this.api = axios.create(config);
   },
 
   /**
-   * After running the test suite, stop (or even kill) the service.
+   * Skip the tests if we failed to construct the API for whatever reason.
    */
-  afterAll() {
-    for (const child of children) {
-      if (!child.killed) {
-        child.kill("SIGTERM");
-        setTimeout(() => {
-          if (!child.killed) {
-            console.error("Failed to kill child with PID %d", child.pid);
-            child.kill("SIGKILL");
-          }
-        }, 1000);
-      }
+  beforeEach() {
+    if (!this.api) {
+      console.error("API not available; skipping");
+      this.skip();
     }
   }
 };

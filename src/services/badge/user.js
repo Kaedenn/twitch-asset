@@ -11,10 +11,10 @@ async function initialize() {
 /* Get all custom badges for a specific login/username */
 function getBadgesFor(req, res) {
   twhttp
-    .getUser(req.params.broadcaster)
+    .getUser(req.params.user)
     .then((data) => twhttp.getUserBadges(data.id))
     .then((data) => {
-      res.status(200).send({ data: data });
+      res.send(data);
     })
     .catch((err) => {
       const [status, message] = twerrors.getStatusFor(err);
@@ -24,7 +24,7 @@ function getBadgesFor(req, res) {
 
 /* Get a user's custom badges by set name */
 function getBadgeSetFor(req, res) {
-  const caster = req.params.broadcaster;
+  const caster = req.params.user;
   const set = req.params.set;
   twhttp
     .getBadgesFor(caster)
@@ -37,7 +37,7 @@ function getBadgeSetFor(req, res) {
     })
     .then((badge) => {
       if (badge !== null) {
-        res.status(200).send({ data: badge });
+        res.send(badge);
       } else {
         res.status(404).send({
           message: `Badge set ${set} for user ${caster} not found`
@@ -52,7 +52,7 @@ function getBadgeSetFor(req, res) {
 
 /* Get a user's custom badges by set and version */
 function getBadgeFor(req, res) {
-  const caster = req.params.broadcaster;
+  const caster = req.params.user;
   const set = req.params.set;
   const version = req.params.version;
   twhttp
@@ -72,7 +72,7 @@ function getBadgeFor(req, res) {
       );
     })
     .then((data) => {
-      res.send({ data });
+      res.send(data);
     })
     .catch((err) => {
       const [status, message] = twerrors.getStatusFor(err);
@@ -82,7 +82,7 @@ function getBadgeFor(req, res) {
 
 /* Get the URL for a user's custom badge */
 function getBadgeUrlFor(req, res) {
-  const caster = req.params.broadcaster;
+  const caster = req.params.user;
   const set = req.params.set;
   const version = req.params.version;
   let size = req.params.size || "image_url_1x";

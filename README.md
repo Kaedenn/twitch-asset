@@ -28,27 +28,65 @@ This application does not make request on behalf of any specific user. The acces
 
 # Response structure
 
-This application mostly serves JSON, except for the specific endpoints that serve text.
+This application serves JSON, except where stated otherwise (such as the URL endpoints).
 
-## Badges
+## Badge object structure
 
-Each badge object has the following layout:
+```typescript
+type Badge = {
+  set_id: string,
+  versions: Version[]
+}
+
+type Version = {
+  id: string,
+  image_url_1x: URL,
+  image_url_2x: URL,
+  image_url_4x: URL
+}
+```
+
+`set_id` is a string that uniquely identifies the badge. This is generally the badge's name.
+
+A `Version`'s `id` attribute uniquely identifies that version of the badge. This is used for subscription tiers, months subscribed, cumulative bits donated, and more. The value is typically numeric, but as a string.
+
+`image_url_1x` is a URL to the small version of the badge.
+
+`image_url_2x` is a URL to the medium version of the badge.
+
+`image_url_4x` is a URL to the large version of the badge.
+
+For example, the global `subscriber` badge has the following layout:
 
 ```
-{ "set_id": String, "versions": [ Object ... ] }
+{
+  "data": {
+    "set_id": "subscriber",
+    "versions": [
+      {
+        "id": "0",
+        "image_url_1x": "https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1",
+        "image_url_2x": "https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/2",
+        "image_url_4x": "https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/3"
+      },
+      {
+        "id": "1",
+        "image_url_1x": "https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1",
+        "image_url_2x": "https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/2",
+        "image_url_4x": "https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/3"
+      }
+    ]
+  }
+}
 ```
 
-where `set_id` refers to the badge's name (eg. `subscriber`) and each version has the following layout:
-
-```
-{ "id": Number, "image_url_1x": String, "image_url_2x": String, "image_url_4x": String }
-```
-
-where `id` is the version index (starting at `0`). The `1x` URL gives a small badge icon, `2x` gives a medium badge image, and `4x` gives a full-size badge image.
+The `1x` URL gives a small badge icon, `2x` gives a medium badge image, and `4x` gives a full-size badge image.
 
 # Endpoints
 
-## `GET /`
+## Misc endpoints
+
+### `GET /`
 
 Responds `HTTP 200 OK` with the following payload:
 
@@ -56,7 +94,7 @@ Responds `HTTP 200 OK` with the following payload:
 { success: true, status: "online" }
 ```
 
-## `GET /status`
+### `GET /status`
 
 Responds `HTTP 200 OK` with the following payload:
 
@@ -64,69 +102,89 @@ Responds `HTTP 200 OK` with the following payload:
 { success: true }
 ```
 
-## `GET /debug`
+### `GET /debug`
 
 Responds `HTTP 200 OK` if debugging is enabled, `HTTP 400 Bad Request` otherwise. Payloads are either `{ success: true }` or `{ success: false, message: "Bad Request" }`.
 
-## `GET /badge_debug`
+## Global badges
 
-Dumps the badge cache to the calling terminal. Returns `HTTP 200 OK` with an empty payload.
+### `GET /badges` or `GET /badge`
 
-## `GET /badges`
+Get a list of all global badges.
 
-Responds with a list of all known global badges:
+### `GET /badge/:set`
 
-```
-{ data: [ Badge... ] }
-```
+Get a specific global badge. Includes all versions.
 
-See above for the `Badge` structure.
+### `GET /badge/:set/:version`
 
-## `GET /badges/:broadcaster`
+Get a specific version of the global badge.
 
-Obtain badge definitions for a specific broadcaster's user ID. Response structure TBD.
+### `GET /badge/:set/:version/url`
 
-## `GET /badge/:set`
+This endpoint serves text.
 
-Responds with a specific badge's information:
+Get the URL to the smallest image of the given global badge and version. This is equivalent to `GET /badge/:set/:version/url/1x`.
 
-```
-{ data: Badge }
-```
+### `GET /badge/:set/:version/url/:size`
 
-See above for the `Badge` structure.
+This endpoint serves text.
 
-## `GET /badge/:set/:version`
+Get the URL to a specific image of the given global badge and version.
 
-Responds with a specific badge and version:
+Extra sizes are accepted in addition to the ones defined in the badge:
 
-```
-{ data: Object }
-```
+| Alias | Value          | Description          |
+| ----- | -------------- | -------------------- |
+| `1x`  | `image_url_1x` | Small, chat-sized    |
+| `2x`  | `image_url_2x` | Medium               |
+| `4x`  | `image_url_4x` | Large, profile-sized |
 
-See above for the `Object`'s structure.
+## User badges
 
-## `GET /badge/:set/:version/url`
+### `GET /badges/:user` or `GET /user/badges/:user` or `GET /user/badge/:user`
 
-Responds with the given badge and version's smallest URL. This is equivalent to `GET /badge/:set/:version/url/1x`. This endpoint gives text, not JSON.
+Get a list of all badges for the given user.
 
-## `GET /badge/:set/:version/url/:size`
+### `GET /user/badge/:user/:set`
 
-Responds with the given badge and version's URL for the specified size. This endpoint gives text, not JSON. In addition to the size values defined for each badge, the following extra sizes are understood:
+Get a user's badge. Includes all versions.
 
-| Size | Value          |
-| ---- | -------------- |
-| `1x` | `image_url_1x` |
-| `2x` | `image_url_2x` |
-| `4x` | `image_url_4x` |
+See `GET /badge/:set`.
 
-## `GET /emote`
+### `GET /user/badge/:user/:set/:version`
+
+Get a specific version of the user's badge.
+
+See `GET /badge/:set/:version`.
+
+### `GET /user/badge/:user/:set/:version/url`
+
+This endpoint serves text.
+
+See `GET /badge/:set/:version/url`.
+
+### `GET /user/badge/:user/:set/:version/url/:size`
+
+This endpoint serves text.
+
+See `GET /badge/:set/:version/url/:size`.
+
+## Emotes and cheermotes
+
+### `GET /emote`
 
 Not yet implemented.
 
-## `GET /cheermote`
+### `GET /cheermote`
 
 Not yet implemented.
+
+## Other endpoints
+
+### `GET /user/:login`
+
+Get information about a specific user.
 
 # Local deployment
 
@@ -147,6 +205,17 @@ I highly recommend you use this endpoint locally. You will need to add a Twitch 
    - Run `npm run start`.
 
 You can now run `npm test` to ensure the endpoint works properly.
+
+# Local deployment with SSL
+
+If you want to use SSL, then follow these steps in addition to the ones above:
+
+1. Purchase or generate your SSL certificate and key files.
+2. Modify the `.env` file:
+   - Set `APP_USE_HTTPS` to `1`.
+   - Change `APP_KEY_FILE` and `APP_CRT_FILE` to your certificate files' paths. They don't need to be in the `certs/` subdirectory.
+
+That should be it. Be sure to run `npm test` to ensure the tests work.
 
 # Bugs and other issues
 

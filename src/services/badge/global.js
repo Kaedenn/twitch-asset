@@ -11,18 +11,14 @@ async function initialize() {
 
 /* Get global badges */
 function getBadges(req, res) {
-  res.status(200).send({
-    data: twbadge.badge_cache.values()
-  });
+  res.send(twbadge.badge_cache.values());
 }
 
 /* Get global badges by set name */
 function getBadgeSet(req, res) {
   const set = req.params.set;
   if (twbadge.badge_cache.has(set)) {
-    res.status(200).send({
-      data: twbadge.badge_cache.get(set)
-    });
+    res.send(twbadge.badge_cache.get(set));
   } else {
     res.status(404).send({
       message: `Unknown set ID "${set}"`
@@ -37,9 +33,7 @@ function getBadge(req, res) {
 
   const result = twbadge.getCachedBadge(set, version);
   if (result !== null) {
-    res.status(200).send({
-      data: result
-    });
+    res.send(result);
   } else {
     res.status(404).send({
       message: `Badge ${set}/${version} not found`
@@ -59,7 +53,7 @@ function getBadgeUrl(req, res) {
   const badge = twbadge.getCachedBadge(set, version);
   if (badge !== null) {
     if (Object.prototype.hasOwnProperty.call(badge, size)) {
-      res.status(200).send(badge[size]);
+      res.send(badge[size]);
     } else {
       res.status(404).send({
         message: `Badge ${set}/${version} lacks size ${size}`

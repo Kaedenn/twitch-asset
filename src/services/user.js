@@ -14,7 +14,7 @@ function getUser(req, res) {
   twhttp
     .getUser(user)
     .then((data) => {
-      res.status(200).send({ data: data });
+      res.send(data);
     })
     .catch((err) => {
       const [status, message] = twerrors.getStatusFor(err);
